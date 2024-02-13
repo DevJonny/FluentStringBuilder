@@ -16,7 +16,7 @@ public class FluentStringBuilder : IBuild, IAmAnAppender, IHasACondition, ICondi
         _stringBuilder = new System.Text.StringBuilder(initialValue);
     }
     
-    public IHasACondition Append(string stringToAppend)
+    public IHasACondition Append(string? stringToAppend)
     {
         if (_stringToAppend is not null)
             _stringBuilder.Append(_stringToAppend);
@@ -28,6 +28,9 @@ public class FluentStringBuilder : IBuild, IAmAnAppender, IHasACondition, ICondi
 
     public ICondition If() => this;
 
+    public IBuild NotNull()
+        => AppendOnCondition(() => _stringToAppend is not null);
+    
     public IBuild NotNullOrEmpty()
         => AppendOnCondition(() => string.IsNullOrEmpty(_stringToAppend));
 

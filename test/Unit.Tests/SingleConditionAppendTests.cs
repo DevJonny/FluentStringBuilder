@@ -38,9 +38,29 @@ public class SingleConditionAppendTests
         // act
         var builtString = new FluentStringBuilder()
             .Append(" ").If().NotNullOrWhitespace()
-            .Build();
-        
-        // assert
-        builtString.Should().Be(string.Empty);
+            .Build()
+            .Should().Be(string.Empty);
+    }
+
+    [Fact]
+    public void AppendIfNotNull_SingleAppend_StringIsEmpty()
+    {
+        // act / assert
+        new FluentStringBuilder()
+            .Append(null).If().NotNull()
+            .Build()
+            .Should().Be(string.Empty);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData(" ")]
+    public void AppendIfNotNull_SingleAppend_StringIsNotEmpty(string input)
+    {
+        // act / assert
+        new FluentStringBuilder()
+            .Append(input).If().NotNull()
+            .Build()
+            .Should().BeEmpty(input);
     }
 }

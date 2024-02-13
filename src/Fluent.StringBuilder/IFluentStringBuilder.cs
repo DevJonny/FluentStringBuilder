@@ -12,6 +12,8 @@ public interface IHasACondition : IBuild
 
 public interface ICondition
 {
+    public IBuild NotNull();
+    
     public IBuild NotNullOrEmpty();
 
     public IBuild NotNullOrWhitespace();
