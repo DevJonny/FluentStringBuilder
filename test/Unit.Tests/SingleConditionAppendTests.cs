@@ -8,12 +8,10 @@ public class SingleConditionAppendTests
         const string expectedString = "I will be appended";
         
         // act
-        var builtString = new FluentStringBuilder()
+        new FluentStringBuilder()
             .Append(expectedString).If().NotNullOrEmpty()
-            .Build();
-        
-        // assert
-        builtString.Should().Be(expectedString);
+            .Build()
+            .Should().Be(expectedString);
     }
     
     [Theory]
@@ -23,20 +21,18 @@ public class SingleConditionAppendTests
         string? appendedString,
         string? expectedString)
     {
-        // act
-        var builtString = new FluentStringBuilder()
+        // act / assert
+        new FluentStringBuilder()
             .Append(appendedString!).If().NotNullOrEmpty()
-            .Build();
-        
-        // assert
-        builtString.Should().Be(expectedString);
+            .Build()
+            .Should().Be(expectedString);
     }
     
     [Fact]
     public void AppendIfNotNullOrWhitespace_SingleAppend_StringIsEmpty()
     {
-        // act
-        var builtString = new FluentStringBuilder()
+        // act / assert
+        new FluentStringBuilder()
             .Append(" ").If().NotNullOrWhitespace()
             .Build()
             .Should().Be(string.Empty);
