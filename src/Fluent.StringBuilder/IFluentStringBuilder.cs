@@ -2,21 +2,27 @@ namespace Fluent.StringBuilder;
 
 public interface IAmAnAppender
 {
-    public IHasACondition Append(string stringToAppend);
+    public IHaveACondition Append(string stringToAppend);
+    public IHaveACondition Append(string delimiter, string stringToAppend);
 }
 
-public interface IHasACondition : IBuild
+public interface IHaveACondition : IBuild
 {
-    public ICondition If();
+    public INegativeCondition If { get; }
+}
+
+public interface INegativeCondition
+{
+    public ICondition Not { get; }
 }
 
 public interface ICondition
 {
-    public IBuild NotNull();
+    public IBuild Null();
     
-    public IBuild NotNullOrEmpty();
+    public IBuild NullOrEmpty();
 
-    public IBuild NotNullOrWhitespace();
+    public IBuild NullOrWhitespace();
 }
 
 public interface IBuild : IAmAnAppender

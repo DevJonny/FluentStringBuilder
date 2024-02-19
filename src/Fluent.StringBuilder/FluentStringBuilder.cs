@@ -1,10 +1,28 @@
 ﻿namespace Fluent.StringBuilder;
 
-public class FluentStringBuilder : IBuild, IAmAnAppender, IHasACondition, ICondition
+public class FluentStringBuilder :
+    IBuild,
+    IAmAnAppender,
+    IHaveACondition,
+    INegativeCondition,
+    ICondition
 {
     private readonly System.Text.StringBuilder _stringBuilder;
 
     private string? _stringToAppend;
+    private string? _delimiter;
+    private bool invertCondition;
+
+    public INegativeCondition If => this;
+
+    public ICondition Not
+    {
+        get
+        {
+            invertCondition = true;
+            return this;
+        }
+    }
 
     public FluentStringBuilder()
     {
@@ -15,47 +33,69 @@ public class FluentStringBuilder : IBuild, IAmAnAppender, IHasACondition, ICondi
     {
         _stringBuilder = new System.Text.StringBuilder(initialValue);
     }
-    
-    public IHasACondition Append(string? stringToAppend)
+
+    public IHaveACondition Append(string? stringToAppend)
     {
-        if (_stringToAppend is not null)
-            _stringBuilder.Append(_stringToAppend);
-        
+        AppendCachedValues();
+
         _stringToAppend = stringToAppend;
 
         return this;
     }
 
-    public ICondition If() => this;
-
-    public IBuild NotNull()
-        => AppendOnCondition(() => _stringToAppend is not null);
-    
-    public IBuild NotNullOrEmpty()
-        => AppendOnCondition(() => string.IsNullOrEmpty(_stringToAppend));
-
-    public IBuild NotNullOrWhitespace()
-        => AppendOnCondition(() => string.IsNullOrWhiteSpace(_stringToAppend));
-
-    private FluentStringBuilder AppendOnCondition(Func<bool> predicate)
+    public IHaveACondition Append(string delimiter, string? stringToAppend)
     {
-        if (predicate.Invoke())
-        {
-            _stringToAppend = null;
-            return this;
-        }
+        AppendCachedValues();
 
-        _stringBuilder.Append(_stringToAppend);
-        _stringToAppend = null;
+        _delimiter = delimiter;
+        _stringToAppend = stringToAppend;
 
         return this;
     }
-    
+
+    public IBuild Null()
+        => AppendOnCondition(() => _stringToAppend is null);
+
+    public IBuild NullOrEmpty()
+        => AppendOnCondition(() => string.IsNullOrEmpty(_stringToAppend));
+
+    public IBuild NullOrWhitespace()
+        => AppendOnCondition(() => string.IsNullOrWhiteSpace(_stringToAppend));
+
     public string Build()
     {
         if (_stringToAppend is not null)
             _stringBuilder.Append(_stringToAppend);
 
         return _stringBuilder.ToString();
+    }
+
+    private FluentStringBuilder AppendOnCondition(Func<bool> predicate)
+    {
+        if (invertCondition && predicate.Invoke())
+        {
+            _stringToAppend = null;
+            _delimiter = null;
+            return this;
+        }
+
+        if (_delimiter is not null)
+            _stringBuilder.Append(_delimiter);
+
+        _stringBuilder.Append(_stringToAppend);
+
+        _delimiter = null;
+        _stringToAppend = null;
+
+        return this;
+    }
+
+    private void AppendCachedValues()
+    {
+        if (_delimiter is not null)
+            _stringBuilder.Append(_delimiter);
+
+        if (_stringToAppend is not null)
+            _stringBuilder.Append(_stringToAppend);
     }
 }
